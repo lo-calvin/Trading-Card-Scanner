@@ -28,7 +28,7 @@ def get_bbox_corner(bbox, img):
 
     return x_min, y_min, x_max, y_max
 
-def get_segemented_card(mask, bbox, img):
+def get_segmented_card(mask, bbox, img):
     resized_mask = cv2.resize(mask, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_NEAREST)
     
     # get masked pixels
@@ -49,7 +49,7 @@ async def process_card(mask, bbox, img, track_id, ret, results):
     x_min, y_min, x_max, y_max = get_bbox_corner(bbox, img)
 
     # Convert to PIL image
-    cropped_cutout = get_segemented_card(mask, bbox, img)
+    cropped_cutout = get_segmented_card(mask, bbox, img)
 
     # Get card id
     matches = ret.get_card_id(cropped_cutout)
