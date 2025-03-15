@@ -111,3 +111,6 @@ async def main():
 
 # Run the asynchronous main function
 asyncio.run(main())
+
+# TODO use the Card object to pull all information then extract that into a database
+# TODO make function calls to important information that nina can call into the frontend
