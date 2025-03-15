@@ -6,12 +6,13 @@ from PIL import Image
 import numpy as np
 from pokemontcgsdk import Card
 from pokemontcgsdk import RestClient
-RestClient.configure('c0a13e31-4371-413c-8f1f-264697acc48e')  # my API key
 import asyncio
 import cv2
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
+RestClient.configure('c0a13e31-4371-413c-8f1f-264697acc48e')  # my API key
+
 
 def get_bbox_corner(bbox, img):
     x, y, w, h = bbox
@@ -82,12 +83,12 @@ async def process_all_cards(masks, bboxs, img, track_ids, ret):
 
 # Main function to run the model, track and process the image
 async def main():
-    det = Detector("yolo11n_seg_best_10epochs.pt")
-    ret = Retriever("ResNet18_embeddings.pt")
+    det = Detector("res\\detection_weights\yolo11n_seg_best_10epochs.pt")
+    ret = Retriever("res\\classfication_embeddings\ResNet18_embeddings.pt")
 
-    img = cv2.imread("test.jpg")
+    img = cv2.imread("res\\test.jpg")
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    results = det.model.track("test.jpg")
+    results = det.model.track(img)
     result = results[0]
     result.show()
 
