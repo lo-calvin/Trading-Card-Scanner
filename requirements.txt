@@ -1,0 +1,6 @@
+matplotlib_inline
+matplotlib
+ipython
+pokemontcgsdk
+ultralytics
+torchvision
