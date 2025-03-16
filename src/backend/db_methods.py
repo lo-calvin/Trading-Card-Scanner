@@ -3,7 +3,7 @@
 import os
 import requests
 from dotenv import load_dotenv
-from init_db import get_db_connection
+from .init_db import get_db_connection
 import logging
 import pandas as pd
 
