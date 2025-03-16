@@ -4,6 +4,13 @@ import pandas as pd
 st.title('Pokemon Trading Card Scanner')
 scan_tab, collection_tab = st.tabs(['Scan', 'Collection'])
 
+# Collection data
+# TODO: connect to database, example data for now
+collection_data = {
+    'Name': ['Pikachu', 'Charmander'],
+    'Price': ['$1', '$2']
+}
+
 # Initial scan info
 if 'scanned_image' not in st.session_state:
     st.session_state.scanned_image = None
@@ -81,4 +88,5 @@ with scan_tab:
 # Collection tab
 with collection_tab:
     st.header('Collection')
+    st.dataframe(collection_data, hide_index=None)
 
