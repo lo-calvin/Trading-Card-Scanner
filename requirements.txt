@@ -6,3 +6,5 @@ ultralytics
 torchvision
 
 imagehash
+
+streamlit
