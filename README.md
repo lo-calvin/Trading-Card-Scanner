@@ -7,7 +7,12 @@ Trading Card Scanner is a tool designed to simplify looking up and storing impor
 <img src="https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/main/res/Recgonizing_card_shapes.png" width="45%">
 </p>
 
-Once the name and id is from a given card, we call to the PokemonTCG API, which provides all information about the card, from statistics to updated pricing. Our app then displays that information in a user friendly setting...
+Once the name and id is from a given card, we call to the PokemonTCG API, which provides all information about the card, from statistics to updated pricing. Our app then displays that information in a user friendly setting and continue to add to your collection.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/main/res/Predicting_trainer_ids.png" width="45%">
+  <img src="https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/main/res/Predicting_pokemon_ids.png" width="45%">
+</p>
 
 ### Create an environment and install dependencies
 
@@ -27,6 +32,6 @@ This will delete previous db and start fresh for now. It will create cards.db in
 
 `python src/backend/init_db.py `
 
-
 ### Running frontend
+
 `python -m streamlit run src/frontend/app.py`
