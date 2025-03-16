@@ -92,35 +92,26 @@ with scan_tab:
     if st.session_state.model_results:
         st.subheader('Scanned data')
         selected_cards = []
-        for i in range(1, len(st.session_state.model_results)+1):
-            card_name = st.session_state.model_results[i].name
-            col1, col2 = st.columns([10, 2.3])
-            with col1: 
-                st.markdown(f'##### Card: {card_name}')
-            # Checkbox to select which cards to be added
-            with col2:
-                if st.checkbox('Select to Add', card_name, key=f'select_{i}'):
-                    selected_cards.append(card_name)
-            with st.expander('Card Information'):
-                data_dict = {k: str(v) if not isinstance(v, str) else v for k, v in st.session_state.model_results[i].__dict__.items()}
-                data_df = pd.DataFrame(data_dict.items(), columns=['Attribute', 'Value'])
-                st.dataframe(
-                    data_df, 
-                    hide_index=True,
-                    column_config={'Attribute': st.column_config.Column(width='medium')}
-                    )
 
-                # st.json(st.session_state.model_results[i].__dict__)
-
-            st.divider()
+        data_dict = dict(zip(st.session_state.scanned_name, st.session_state.scanned_id))
+        data_df = pd.DataFrame(data_dict.items(), columns=['Card Name', 'Card ID'])
+        event = st.dataframe(
+            data_df, 
+            hide_index=True, 
+            on_select='rerun',
+            selection_mode='multi-row',
+            )
+        
+        cards = event.selection.rows
+        if cards:
+            card_ids = [data_df.iloc[i]['Card ID'] for i in cards]
+            card_names = [data_df.iloc[i]['Card Name'] for i in cards]
 
     # Button to add to database
     if st.button('Add to collection', type='primary'):
-        for name in selected_cards:
-            index = st.session_state.scanned_name.index(name)
-            card_id = st.session_state.scanned_id[index]
-            populate_tables(card_id)
-        st.success('Added to collection!')
+        for id in card_ids:
+            populate_tables(id)
+    st.success(f'{card_names} added to collection.')
 
 # Collection tab
 with collection_tab:
