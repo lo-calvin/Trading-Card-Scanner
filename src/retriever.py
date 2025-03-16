@@ -8,9 +8,10 @@ import re
 
 class Retriever:
     def __init__(self, embeddings_path) -> None:
-        model = models.resnet18(pretrained=True)
+        model = models.resnet18(pretrained=False)
         model = torch.nn.Sequential(*list(model.children())[:-1])  # Remove the classification head
         model.eval()
+        model.load_state_dict(torch.load("res/detection_weights/resnet18_embeddings.pth", map_location=torch.device('cpu')))
         self.model = model
 
         # define preprocessing transform
