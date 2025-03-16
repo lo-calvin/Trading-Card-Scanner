@@ -69,3 +69,7 @@ Once scanned you will be able to select which cards are added to your database
 After selecting your cards you can now view the pricing information under the collections tab
 
 ![alt text](https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/refs/heads/main/res/readme%20images/collection.png)
+
+# LICENSE
+
+This project is licensed under MIT license. See LICENSE file in root directory.
