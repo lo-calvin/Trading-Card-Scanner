@@ -15,8 +15,8 @@ Jordan Lewis: lewis.jor@northeastern.edu
 Trading Card Scanner is a tool designed to simplify looking up and storing important information about your Pokemon TCG collection. Our app utilizes the Qualcomm AI YOLOv11-Detection model to recognize the card shapes and ResNet to extract key card information.
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/main/res/cards_on_synthetic_background.png" width="45%">
-<img src="https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/main/res/Recgonizing_card_shapes.png" width="45%">
+<img src="https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/refs/heads/main/res/readme%20images/cards_on_synthetic_background.png" width="45%">
+<img src="https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/refs/heads/main/res/readme%20images/Recgonizing_card_shapes.png" width="45%">
 </p>
 
 Once the name and id is from a given card, we call to the PokemonTCG API, which provides all information about the card, from statistics to updated pricing. Our app then displays that information in a user friendly setting and continue to add to your collection.
