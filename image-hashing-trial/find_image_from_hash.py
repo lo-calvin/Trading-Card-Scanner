@@ -3,6 +3,15 @@ import json
 from PIL import Image
 import imagehash
 
+HASH_WEIGHTS = {
+    'phash': 1,        # phash is most sensitive to structural changes
+    'dhash': 0.2,        # dhash is most sensitive to gradient changes
+    'average_hash': 0.4,   # average hash is the most stable but least sensitive
+    'whash': 0.1         # whash is most sensitive to texture changes
+}
+
+CROPPED_IMAGE_PATH = "cropped/cropped_cutout_2.png"
+
 average_hash_file = 'database/image_hashes_average_hash.json'
 dhash_file = 'database/image_hashes_dhash.json'
 phash_file = 'database/image_hashes_phash.json'
@@ -20,11 +29,9 @@ with open(phash_file, 'r', encoding='utf-8') as f:
     
 with open(whash_file, 'r', encoding='utf-8') as f:
     whash_data = json.load(f)
-    
 
 # load the cropped images
-cropped_image_path = "cropped/cropped_cutout_0.png"
-cropped_image = Image.open(cropped_image_path)
+cropped_image = Image.open(CROPPED_IMAGE_PATH)
 cropped_phash = imagehash.phash(cropped_image)
 cropped_dhash = imagehash.dhash(cropped_image)
 cropped_whash = imagehash.whash(cropped_image)
@@ -60,20 +67,13 @@ print(f"Closest image by whash: {closest_whash_id} with distance {whash_distance
 
 def calculate_weighted_similarity(phash_distance, dhash_distance, average_hash_distance, whash_distance):
     """calculate the weighted similarity"""
-    weights = {
-        'phash': 0.8,        # phash is most sensitive to structural changes
-        'dhash': 0.5,        # dhash is most sensitive to gradient changes
-        'average_hash': 1,  # average hash is the most stable but least sensitive
-        'whash': 0.3         # whash is most sensitive to texture changes
-    }
-    
-    total_weight = sum(weights.values())
+    total_weight = sum(HASH_WEIGHTS.values())
     
     weighted_distance = (
-        phash_distance * weights['phash'] +
-        dhash_distance * weights['dhash'] +
-        average_hash_distance * weights['average_hash'] +
-        whash_distance * weights['whash']
+        phash_distance * HASH_WEIGHTS['phash'] +
+        dhash_distance * HASH_WEIGHTS['dhash'] +
+        average_hash_distance * HASH_WEIGHTS['average_hash'] +
+        whash_distance * HASH_WEIGHTS['whash']
     ) / total_weight
     
     return weighted_distance
