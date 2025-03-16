@@ -1,13 +1,18 @@
 import streamlit as st
 import pandas as pd
-
 import sys
 import os 
+import asyncio
+import tempfile
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Database methods
 from backend.db_methods import get_card, populate_tables, retrieve_card_pricing_table, retrieve_pokemon_information_table
+# Model
+from model import Model
+
+model = Model()
 
 st.title('Pokemon Trading Card Scanner')
 scan_tab, collection_tab = st.tabs(['Scan', 'Collection'])
@@ -15,8 +20,8 @@ scan_tab, collection_tab = st.tabs(['Scan', 'Collection'])
 # Initial scan info
 if 'scanned_image' not in st.session_state:
     st.session_state.scanned_image = None
-if 'scanned_data' not in st.session_state:
-    st.session_state.scanned_data = None
+if 'model_results' not in st.session_state:
+    st.session_state.model_results = None
 if 'scanned_name' not in st.session_state:
     st.session_state.scanned_name = None
 if 'scanned_id' not in st.session_state:
@@ -24,14 +29,17 @@ if 'scanned_id' not in st.session_state:
 
 # Send card to scan
 def scan_card(image):
-    # TODO: send to model
-    
-    card_id = "xy1-146"
-    st.session_state.scanned_id = card_id
-    card = get_card(card_id) # call database method to get card info from id
-    st.session_state.scanned_data = card['data']
-    st.session_state.scanned_name = card['data']['name']
+    # Temp save image
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.jpg') as temp_image:
+        temp_image.write(image.read())
+        temp_image_path = temp_image.name
 
+    # TODO: refactor for multiple cards
+    # Call model and save results
+    asyncio.run(model.process_image(temp_image_path))
+    st.session_state.model_results = model.results
+    st.session_state.scanned_id = model.results[1].id
+    st.session_state.scanned_name = model.results[1].name
 
 # Dialog for camera
 @st.dialog('Scan from Camera')
@@ -57,6 +65,7 @@ def scan_from_file():
             st.session_state.scanned_image = img
             st.rerun()
 
+# TODO: refactor for multiple cards
 # Scan tab
 with scan_tab:
     st.header('Scan a new card')
@@ -69,10 +78,10 @@ with scan_tab:
         st.button('Scan from file', on_click=scan_from_file)
 
     # Display scanned card name
-    if st.session_state.scanned_data:
+    if st.session_state.model_results:
         st.subheader(f'Scanned card: {st.session_state.scanned_name}')
     col1, col2 = st.columns(2)
-    
+
     # Display scanned image
     with col1:
         if st.session_state.scanned_image:
@@ -80,9 +89,9 @@ with scan_tab:
 
     # Display scanned data
     with col2:
-        if st.session_state.scanned_data:
+        if st.session_state.model_results:
             # TODO: filter what data we want to display here when scanning card
-            scanned_data_df = pd.DataFrame([st.session_state.scanned_data])
+            scanned_data_df = pd.DataFrame([st.session_state.model_results[1].__dict__])
             scanned_data_df = scanned_data_df.transpose()
             scanned_data_df_html = scanned_data_df.to_html(header=False)
             st.markdown(scanned_data_df_html, unsafe_allow_html=True)
@@ -97,10 +106,11 @@ with scan_tab:
 with collection_tab:
     st.header('Collection')
     
+    # Get from database
     collection_prices_df = retrieve_card_pricing_table()
     collection_info_df = retrieve_pokemon_information_table()
 
-    # Card Pricing Table
+    # Display Card Pricing Table
     st.subheader('Card Pricing Table')
     st.dataframe(
         collection_prices_df,
@@ -111,7 +121,7 @@ with collection_tab:
             'Price URL': st.column_config.LinkColumn()
         })
     
-    # Pokemon Information Table
+    # Display Pokemon Information Table
     st.subheader('Pokemon Information Table')
     st.dataframe(
         collection_info_df,
