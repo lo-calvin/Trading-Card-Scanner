@@ -1,6 +1,9 @@
+import cv2
+import asyncio
 from detector import Detector
 from retriever import Retriever
 import re
+import os
 import matplotlib.pyplot as plt
 from PIL import Image
 import numpy as np
@@ -29,9 +32,11 @@ def get_bbox_corner(bbox, img):
 
     return x_min, y_min, x_max, y_max
 
+
 def get_segmented_card(mask, bbox, img):
-    resized_mask = cv2.resize(mask, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_NEAREST)
-    
+    resized_mask = cv2.resize(
+        mask, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_NEAREST)
+
     # get masked pixels
     cutout = resized_mask[..., None]*img
 
@@ -45,6 +50,7 @@ def get_segmented_card(mask, bbox, img):
     cropped_cutout = Image.fromarray((cropped_cutout * 255).astype(np.uint8))
 
     return cropped_cutout
+
 
 async def process_card(mask, bbox, img, track_id, ret, results):
     x_min, y_min, x_max, y_max = get_bbox_corner(bbox, img)
@@ -63,7 +69,9 @@ async def process_card(mask, bbox, img, track_id, ret, results):
     # Draw bounding box and label on the original image
     cv2.rectangle(img, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
     label = f"ID: {track_id} - {card.name}"
-    cv2.putText(img, label, (x_min, y_min + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+    cv2.putText(img, label, (x_min, y_min + 30),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+
 
 async def process_all_cards(masks, bboxs, img, track_ids, ret):
     tasks = []
@@ -71,7 +79,8 @@ async def process_all_cards(masks, bboxs, img, track_ids, ret):
 
     # Loop over masks and create asynchronous tasks for each card
     for i in range(len(masks)):
-        task = asyncio.create_task(process_card(masks[i], bboxs[i], img, track_ids[i], ret, results))
+        task = asyncio.create_task(process_card(
+            masks[i], bboxs[i], img, track_ids[i], ret, results))
         tasks.append(task)
 
     # Wait for all tasks to complete
@@ -82,12 +91,19 @@ async def process_all_cards(masks, bboxs, img, track_ids, ret):
         print(result)
 
 # Main function to run the model, track and process the image
+
+
 async def main():
+    det = Detector(
+        "../res/detection_weights/yolo11n_seg_best_10epochs.pt")
+    ret = Retriever("../res/classification_embeddings/ResNet18_embeddings.pt")
     det = Detector("res\\detection_weights\yolo11n_seg_best_10epochs.pt")
     ret = Retriever("res\\classfication_embeddings\ResNet18_embeddings.pt")
 
+    img = cv2.imread("../res/test.jpg")
     img = cv2.imread("res\\test.jpg")
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    results = det.model.track("../res/test.jpg")
     results = det.model.track(img)
     result = results[0]
     result.show()
