@@ -8,7 +8,7 @@ import tempfile
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Database methods
-from backend.db_methods import get_card, populate_tables, retrieve_card_pricing_table, retrieve_pokemon_information_table
+from backend.db_methods import get_card, populate_tables, retrieve_card_pricing_table, retrieve_pokemon_information_table, delete_card
 # Model
 from model import Model
 
@@ -69,7 +69,7 @@ def scan_from_file():
         if st.button('Scan'):
             with st.spinner('Scanning...'):
                 scan_card(img)
-            st.session_state.scanned_image = img
+                st.session_state.scanned_image = img
             st.rerun()
 
 # Scan tab
@@ -92,17 +92,26 @@ with scan_tab:
     if st.session_state.model_results:
         st.subheader('Scanned data')
         selected_cards = []
-        for i in range(1, len(st.session_state.model_results)):
+        for i in range(1, len(st.session_state.model_results)+1):
             card_name = st.session_state.model_results[i].name
             col1, col2 = st.columns([10, 2.3])
             with col1: 
-                st.write(f'**Card: {card_name}**')
+                st.markdown(f'##### Card: {card_name}')
+            # Checkbox to select which cards to be added
             with col2:
                 if st.checkbox('Select to Add', card_name, key=f'select_{i}'):
                     selected_cards.append(card_name)
             with st.expander('Card Information'):
-                data_df = pd.DataFrame(st.session_state.model_results[i].__dict__.items(), columns=['Attribute', 'Value'])
-                st.dataframe(data_df, hide_index=True)
+                data_dict = {k: str(v) if not isinstance(v, str) else v for k, v in st.session_state.model_results[i].__dict__.items()}
+                data_df = pd.DataFrame(data_dict.items(), columns=['Attribute', 'Value'])
+                st.dataframe(
+                    data_df, 
+                    hide_index=True,
+                    column_config={'Attribute': st.column_config.Column(width='medium')}
+                    )
+
+                # st.json(st.session_state.model_results[i].__dict__)
+
             st.divider()
 
     # Button to add to database
@@ -131,6 +140,8 @@ with collection_tab:
             'Image': st.column_config.ImageColumn(width='small'),
             'Price URL': st.column_config.LinkColumn()
         })
+    
+    st.divider()
     
     # Display Pokemon Information Table
     st.subheader('Pokemon Information Table')
