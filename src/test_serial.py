@@ -88,7 +88,7 @@ def process_all_cards(masks, bboxs, img, track_ids, ret, cache):
 # Main function to run the model, track and process the image
 def main():
     
-    det = Detector("res\\detection_weights\\yolo11n_seg_best_10epochs.pt")
+    det = Detector("res\\detection_weights\\yolo11n_seg_best_10epochs.onnx")
     ret = Retriever("res\\classfication_embeddings\\ResNet18_embeddings.pt")
     cards_cache = FIFOCache(30)
 
