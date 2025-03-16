@@ -1,3 +1,4 @@
 .env
 .ipynb_checkpoints
-src/_*
+__pycache__/
+*.db
