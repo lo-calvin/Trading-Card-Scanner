@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import sys
 import os 
-import asyncio
 import tempfile
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -26,6 +25,8 @@ if 'scanned_name' not in st.session_state:
     st.session_state.scanned_name = []
 if 'scanned_id' not in st.session_state:
     st.session_state.scanned_id = []
+if 'model_img' not in st.session_state:
+    st.session_state.model_img = None
 
 # Send card to scan
 def scan_card(image):
@@ -35,8 +36,9 @@ def scan_card(image):
         temp_image_path = temp_image.name
 
     # Call model and save results
-    asyncio.run(model.process_image(temp_image_path))
+    model.process_image(temp_image_path)
     st.session_state.model_results = model.results
+    st.session_state.model_img = model.img
     
     # Save each card name and id
     names = []
@@ -84,9 +86,9 @@ with scan_tab:
         st.button('Scan from file', on_click=scan_from_file)
 
     # Display scanned image
-    if st.session_state.scanned_image:
+    if st.session_state.model_img is not None:
         st.subheader('Scanned image')
-        st.image(st.session_state.scanned_image)
+        st.image(st.session_state.model_img)
 
     # Display scanned data in table
     if st.session_state.model_results:
@@ -109,9 +111,12 @@ with scan_tab:
 
     # Button to add to database
     if st.button('Add to collection', type='primary'):
-        for id in card_ids:
-            populate_tables(id)
-    st.success(f'{card_names} added to collection.')
+        if len(cards) == 0:
+            st.error('No cards selected.')
+        else: 
+            for id in card_ids:
+                populate_tables(id)
+            st.success(f'{card_names} added to collection.')
 
 # Collection tab
 with collection_tab:
