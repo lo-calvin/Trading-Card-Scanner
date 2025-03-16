@@ -12,8 +12,12 @@ $ . venv/bin/activate
 $ pip install -r requirements.txt
 ```
 
-# init db (assuming running from Trading-Card-Scanner dir)
+### init db (assuming running from Trading-Card-Scanner dir)
 
 This will delete previous db and start fresh for now. It will create cards.db in Trading-Card-Scanner/src/backend/
 
 `python src/backend/init_db.py `
+
+
+### Running frontend
+`python -m streamlit run src/frontend/app.py`
