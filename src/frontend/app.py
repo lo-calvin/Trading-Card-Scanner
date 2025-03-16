@@ -23,9 +23,9 @@ if 'scanned_image' not in st.session_state:
 if 'model_results' not in st.session_state:
     st.session_state.model_results = None
 if 'scanned_name' not in st.session_state:
-    st.session_state.scanned_name = None
+    st.session_state.scanned_name = []
 if 'scanned_id' not in st.session_state:
-    st.session_state.scanned_id = None
+    st.session_state.scanned_id = []
 
 # Send card to scan
 def scan_card(image):
@@ -34,12 +34,18 @@ def scan_card(image):
         temp_image.write(image.read())
         temp_image_path = temp_image.name
 
-    # TODO: refactor for multiple cards
     # Call model and save results
     asyncio.run(model.process_image(temp_image_path))
     st.session_state.model_results = model.results
-    st.session_state.scanned_id = model.results[1].id
-    st.session_state.scanned_name = model.results[1].name
+    
+    # Save each card name and id
+    names = []
+    ids = []
+    for card, data in model.results.items():
+        names.append(data.name)
+        ids.append(data.id)
+    st.session_state.scanned_name = names
+    st.session_state.scanned_id = ids
 
 # Dialog for camera
 @st.dialog('Scan from Camera')
@@ -61,11 +67,11 @@ def scan_from_file():
     if img:
         st.image(img)
         if st.button('Scan'):
-            scan_card(img)
+            with st.spinner('Scanning...'):
+                scan_card(img)
             st.session_state.scanned_image = img
             st.rerun()
 
-# TODO: refactor for multiple cards
 # Scan tab
 with scan_tab:
     st.header('Scan a new card')
@@ -77,30 +83,35 @@ with scan_tab:
     with col2:
         st.button('Scan from file', on_click=scan_from_file)
 
-    # Display scanned card name
-    if st.session_state.model_results:
-        st.subheader(f'Scanned card: {st.session_state.scanned_name}')
-    col1, col2 = st.columns(2)
-
     # Display scanned image
-    with col1:
-        if st.session_state.scanned_image:
-            st.image(st.session_state.scanned_image)
+    if st.session_state.scanned_image:
+        st.subheader('Scanned image')
+        st.image(st.session_state.scanned_image)
 
-    # Display scanned data
-    with col2:
-        if st.session_state.model_results:
-            # TODO: filter what data we want to display here when scanning card
-            scanned_data_df = pd.DataFrame([st.session_state.model_results[1].__dict__])
-            scanned_data_df = scanned_data_df.transpose()
-            scanned_data_df_html = scanned_data_df.to_html(header=False)
-            st.markdown(scanned_data_df_html, unsafe_allow_html=True)
+    # Display scanned data in table
+    if st.session_state.model_results:
+        st.subheader('Scanned data')
+        selected_cards = []
+        for i in range(1, len(st.session_state.model_results)):
+            card_name = st.session_state.model_results[i].name
+            col1, col2 = st.columns([10, 2.3])
+            with col1: 
+                st.write(f'**Card: {card_name}**')
+            with col2:
+                if st.checkbox('Select to Add', card_name, key=f'select_{i}'):
+                    selected_cards.append(card_name)
+            with st.expander('Card Information'):
+                data_df = pd.DataFrame(st.session_state.model_results[i].__dict__.items(), columns=['Attribute', 'Value'])
+                st.dataframe(data_df, hide_index=True)
+            st.divider()
 
-            # Button to add to database
-            if st.button('Add to collection', type='primary'):
-                # Add to database
-                populate_tables(st.session_state.scanned_id)
-                st.success('Added to collection!')
+    # Button to add to database
+    if st.button('Add to collection', type='primary'):
+        for name in selected_cards:
+            index = st.session_state.scanned_name.index(name)
+            card_id = st.session_state.scanned_id[index]
+            populate_tables(card_id)
+        st.success('Added to collection!')
 
 # Collection tab
 with collection_tab:
