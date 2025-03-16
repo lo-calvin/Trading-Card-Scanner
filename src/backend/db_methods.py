@@ -5,6 +5,7 @@ import requests
 from dotenv import load_dotenv
 from init_db import get_db_connection
 import logging
+import pandas as pd
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
@@ -286,7 +287,7 @@ def get_pokemon_info(id):
     pokemon = cursor.fetchone()
 
     conn.close()
-    logging.info(f"Retrieved card: {pokemon}")
+    logging.info(f"Retrieved pokemon information: {pokemon}")
     return pokemon
 
 
@@ -306,8 +307,93 @@ def get_price_info(id):
     prices = cursor.fetchall()
 
     conn.close()
-    logging.info(f"Retrieved card: {prices}")
+    logging.info(f"Retrieved pricing: {prices}")
     return prices
+
+
+# TODO combine certain elements for different dataframes
+
+def retrieve_card_pricing_table():
+    '''
+    Retrieves all cards with pricing information, grouping prices under
+    "normal", "holofoil", and "reverse holofoil" categories.
+    Displays: Image, Name, Set, Rarity, Number Owned, Normal Price, 
+    Holofoil Price, Reverse Holofoil Price, Price URL.
+    Returns a pandas DataFrame.
+    '''
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    query = """
+    SELECT 
+        Card.image_url, 
+        Card.name, 
+        Card.set_name, 
+        Card.rarity, 
+        Card.count, 
+        MAX(CASE WHEN Prices.type = 'normal' THEN Prices.market END) AS normal_price,
+        MAX(CASE WHEN Prices.type = 'holofoil' THEN Prices.market END) AS holofoil_price,
+        MAX(CASE WHEN Prices.type = 'reverseHolofoil' THEN Prices.market END) AS reverse_holofoil_price,
+        TCGPlayer.url 
+    FROM Card
+    LEFT JOIN TCGPlayer ON Card.url = TCGPlayer.url
+    LEFT JOIN Prices ON TCGPlayer.url = Prices.tcgplayer_url
+    GROUP BY Card.id
+    """
+
+    cursor.execute(query)
+    results = cursor.fetchall()
+    conn.close()
+
+    # Convert to pandas DataFrame
+    df = pd.DataFrame(results, columns=[
+        "Image", "Name", "Set", "Rarity", "Number Owned",
+        "Normal Price", "Holofoil Price", "Reverse Holofoil Price", "Price URL"
+    ])
+
+    return df
+
+
+def retrieve_pokemon_information_table():
+    '''
+    Retrieves all cards with pricing information, displaying:
+    image, name, set, rarity, market price, low price, high price, price url.
+    Returns a pandas DataFrame.
+    '''
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    query = """
+    SELECT 
+        Card.image_url, 
+        Card.name, 
+        Card.set_name, 
+        Card.rarity, 
+        Card.count, 
+        Pokemon.supertype, 
+        Pokemon.hp, 
+        Pokemon.type, 
+        Pokemon.evolves_from, 
+        Pokemon.evolves_to, 
+        Pokemon.release_date, 
+        TCGPlayer.url 
+    FROM Pokemon
+    JOIN Card ON Pokemon.id = Card.id
+    LEFT JOIN TCGPlayer ON Card.url = TCGPlayer.url
+    """
+
+    cursor.execute(query)
+    results = cursor.fetchall()
+    conn.close()
+
+    # Convert to pandas DataFrame
+    df = pd.DataFrame(results, columns=[
+        "Image", "Name", "Set", "Rarity", "Number Owned", "Supertype", "HP", "Type",
+        "Evolves From", "Evolves To", "Release Date", "Price URL"
+    ])
+
+    return df
+
 
 # ============================= Database Deletion Functions ===============================
 
@@ -372,16 +458,18 @@ def delete_card(id):
 
 def main():
 
-    populate_tables('xy1-1')
-    get_card_info('xy1-1')
-    get_pokemon_info('xy1-1')
-    get_price_info('xy1-1')
+    # cards = ['swsh4-25', 'xy1-1', 'xyp-XY27',
+    #          'xyp-XY25', 'sm35-1', 'ex9-1', 'ex9-86']
+    # for card in cards:
+    #     populate_tables(card)
+    #     get_card_info(card)
+    #     get_pokemon_info(card)
+    #     get_price_info(card)
 
-    delete_card('xy1-1')
-
-    get_card_info('xy1-1')
-    get_pokemon_info('xy1-1')
-    get_price_info('xy1-1')
+    card_pricing_df = retrieve_card_pricing_table()
+    print(card_pricing_df)
+    poke_info = retrieve_pokemon_information_table()
+    print(poke_info)
 
 
 if __name__ == "__main__":
