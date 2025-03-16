@@ -61,27 +61,26 @@ class Model:
         # Get card id
         matches = self.ret.get_card_id(cropped_cutout)
         card_id = matches[0]
-        card = Card.find(card_id)
+        try:
+            card = Card.find(card_id)
+        except:
+            print("Card not found")
+            return
 
         # Store the result
         self.results[track_id] = card
 
         # Draw bounding box and label on the original image
-        # cv2.rectangle(self.img, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
-        # label = f"ID: {track_id} - {card.name}"
-        # cv2.putText(self.img, label, (x_min, y_min + 30),
-        #             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
-
-
-        # Draw bounding box and label on the original image
-        cv2.rectangle(self.img, (x_min, y_min), (x_max, y_max), (255, 0, 0), 3)
+        
         label = f"ID: {track_id} - {card.name}"
-        if self.img.shape[0] > 1500:
+        if self.img.shape[1] > 1500:
             cv2.putText(self.img, label, (x_min, int(bbox[1]) + 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 10)
             cv2.putText(self.img, label, (x_min, int(bbox[1]) + 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 5)
+            cv2.rectangle(self.img, (x_min, y_min), (x_max, y_max), (255, 0, 0), 8)
         else:
+            cv2.rectangle(self.img, (x_min, y_min), (x_max, y_max), (255, 0, 0), 3)
             cv2.putText(self.img, label, (x_min, int(bbox[1]) + 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 8)
             cv2.putText(self.img, label, (x_min, int(bbox[1]) + 30),
