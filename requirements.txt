@@ -4,11 +4,9 @@ ipython
 pokemontcgsdk
 ultralytics
 torchvision
-os
 requests
 dotenv 
 logging
 pandas
 imagehash
-sqlite3
 streamlit
