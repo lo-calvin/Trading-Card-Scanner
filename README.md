@@ -22,8 +22,8 @@ Trading Card Scanner is a tool designed to simplify looking up and storing impor
 Once the name and id is from a given card, we call to the PokemonTCG API, which provides all information about the card, from statistics to updated pricing. Our app then displays that information in a user friendly setting and continue to add to your collection.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/main/res/Predicting_pokemon_ids.png" width="45%">
-  <img src="https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/main/res/Predicting_trainer_ids.png" width="45%">
+  <img src="https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/refs/heads/main/res/readme%20images/Predicting_pokemon_ids.png" width="45%">
+  <img src="https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/refs/heads/main/res/readme%20images/Predicting_trainer_ids.png" width="45%">
 </p>
 
 ## How to Run
@@ -58,12 +58,14 @@ python -m streamlit run src/frontend/app.py
 
 Once running, you will be able to see the home screen. Here you will have the option to 'Scan from camera' or 'Scan from file'. Either option will allow you to input an image of your cards to be scanned for your collection.
 
-image
+![alt text](https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/refs/heads/main/res/readme%20images/homepage.png)
 
 Once scanned you will be able to select which cards are added to your database
 
-image
+![alt text](https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/refs/heads/main/res/readme%20images/scannedCards.png)
+
+![alt text](https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/refs/heads/main/res/readme%20images/select%20scanned%20data.png)
 
 After selecting your cards you can now view the pricing information under the collections tab
 
-image
+![alt text](https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/refs/heads/main/res/readme%20images/collection.png)
