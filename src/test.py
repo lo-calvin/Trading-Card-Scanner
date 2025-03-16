@@ -14,6 +14,8 @@ import cv2
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
+import os
+
 RestClient.configure('c0a13e31-4371-413c-8f1f-264697acc48e')  # my API key
 
 
@@ -94,14 +96,12 @@ async def process_all_cards(masks, bboxs, img, track_ids, ret):
 
 
 async def main():
-    det = Detector(
-        "../res/detection_weights/yolo11n_seg_best_10epochs.pt")
-    ret = Retriever("../res/classification_embeddings/ResNet18_embeddings.pt")
-    det = Detector("res\\detection_weights\yolo11n_seg_best_10epochs.pt")
-    ret = Retriever("res\\classfication_embeddings\ResNet18_embeddings.pt")
+    det = Detector(os.path.join("res", "detection_weights",
+                   "yolo11n_seg_best_10epochs.pt"))
+    ret = Retriever(os.path.join(
+        "res", "classfication_embeddings", "ResNet18_embeddings.pt"))
 
-    img = cv2.imread("../res/test.jpg")
-    img = cv2.imread("res\\test.jpg")
+    img = cv2.imread(os.path.join("res", "test.jpg"))
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     results = det.model.track("../res/test.jpg")
     results = det.model.track(img)
