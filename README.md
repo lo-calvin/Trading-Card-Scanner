@@ -52,6 +52,12 @@ Once scanned you will be able to select which cards are added to your database
 
 ![alt text](https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/refs/heads/main/res/readme%20images/scannedCards.png)
 
+![alt text](https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/refs/heads/main/res/readme%20images/select%20scanned%20data.png)
+
+After selecting your cards you can now view the pricing information under the collections tab
+
+![alt text](https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/refs/heads/main/res/readme%20images/collection.png)
+
 ### Contributors
 
 Calvin Lo: lo.cal@northeastern.edu
@@ -63,11 +69,6 @@ Jingyu Wang: wang.jingyu6@northeastern.edu
 Xiaolai Chen: chen.xiaola@northeastern.edu
 
 Jordan Lewis: lewis.jor@northeastern.edu
-![alt text](https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/refs/heads/main/res/readme%20images/select%20scanned%20data.png)
-
-After selecting your cards you can now view the pricing information under the collections tab
-
-![alt text](https://raw.githubusercontent.com/lo-calvin/Trading-Card-Scanner/refs/heads/main/res/readme%20images/collection.png)
 
 # LICENSE
 
